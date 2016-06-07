@@ -11,18 +11,19 @@ Template.readCSV.events({
       Papa.parse(template.find('#csv-file').files[0], {
           header: true,
           complete: function(results) {
-            console.log(results.data[0])
-            Rows.batchInsert(results.data)
+            Meteor.call('removeAllRows')
+            //Rows.batchInsert(results.data)
+            console.log(results.data.length)
           },
           skipEmptyLines: true,
-          preview: 100
+          //preview: 100
       });
    } 
  });
  
  Template.readCSV.helpers({
    rows() {
-     return Rows.find({})
+     return Rows.find({},{limit:10})
    }
  });
  
