@@ -1,0 +1,25 @@
+<head>
+  <title>Data Hub</title>
+</head>
+
+<body>
+  <h1>Data Hub</h1>
+
+  {{> readCSV}}
+  
+</body>
+
+<template name="readCSV">
+    <input type="file" id="csv-file" name="files"/>
+    <button type="submit" class="btn btn-primary btnReadCsv">Read</button>
+    <hr/>
+    <table>
+    {{#each row in rows}}
+      <tr>
+        {{#each field in arrayify row}}
+          <td>{{field.value}}</td>
+        {{/each}}
+      </tr>
+    {{/each}}
+    </table>
+</template>
