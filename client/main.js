@@ -4,6 +4,13 @@ import { Mongo } from 'meteor/mongo'
 
 export const Rows = new Mongo.Collection(null)
 
+export const Validations = {
+    $and: [
+      { phone: {$ne: ""} },
+      { email: {$ne: ""} }
+    ]
+}
+
 Template.readCSV.events({
     "click .readCSVButton": (event, template) => {
         Papa.parse(
@@ -11,10 +18,11 @@ Template.readCSV.events({
             {
                 header: true,
                 skipEmptyLines: true,
-                preview: 100,
+                preview: 200,
                 complete: (results) => {
 //                    Meteor.call("removeAllRows")
                     Rows.batchInsert(results.data)
+                    Rows.update(Validations, {$set: {valid: true}}, {multi: true})
                 }
             }
         )
@@ -22,16 +30,21 @@ Template.readCSV.events({
 })
 
 Template.readCSV.helpers({
-    rows: () => Rows.find({},{limit:100}).fetch()
-})
-
-Template.registerHelper(
-    'arrayify', 
-    (obj) => {
+  
+    rows: () => Rows.find({},{limit:200}).fetch(),
+  
+    attributes: (row) => {
+      if (row.valid)
+        return null
+      else
+        return { style: "background-color:red" }
+    },
+    
+    arrayify: (obj) => {
         var result = []
         for (key in obj) {
             result.push({ name:key, value: obj[key] })
         }
         return result
     }
-)
+})
