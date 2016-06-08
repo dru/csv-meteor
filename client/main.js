@@ -18,7 +18,6 @@ Template.readCSV.events({
             {
                 header: true,
                 skipEmptyLines: true,
-                preview: 200,
                 complete: (results) => {
 //                    Meteor.call("removeAllRows")
                     Rows.batchInsert(results.data)
@@ -32,6 +31,8 @@ Template.readCSV.events({
 Template.readCSV.helpers({
   
     rows: () => Rows.find({},{limit:200}).fetch(),
+  
+    total_rows: () => Rows.find().count(),
   
     attributes: (row) => {
       if (row.valid)
