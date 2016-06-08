@@ -3,17 +3,16 @@
 </head>
 
 <body>
-  <h1>Data Hub</h1>
-
-  {{> readCSV}}
-  
+    <div>
+          <h1>Data Hub</h1>
+          {{> readCSV}}
+    </div><!-- /.container -->  
 </body>
 
 <template name="readCSV">
     <input type="file" id="csv-file" name="files"/>
-    <button type="submit" class="btn btn-primary btnReadCsv">Read</button>
-    <hr/>
-    <table>
+    <button type="submit" class="btn btn-primary readCSVButton">Read</button>
+    <table class="table table-striped table-bordered">
     {{#each row in rows}}
       <tr>
         {{#each field in arrayify row}}
