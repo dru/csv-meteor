@@ -11,6 +11,8 @@ export const Validations = {
     ]
 }
 
+TotalRows = new ReactiveVar(0)
+
 Template.readCSV.events({
     "click .readCSVButton": (event, template) => {
         Papa.parse(
@@ -18,10 +20,12 @@ Template.readCSV.events({
             {
                 header: true,
                 skipEmptyLines: true,
-                complete: (results) => {
-//                    Meteor.call("removeAllRows")
-                    Rows.batchInsert(results.data)
-                    Rows.update(Validations, {$set: {valid: true}}, {multi: true})
+                chunk: (results) => {
+                    if (TotalRows.get() == 0) {
+                        Rows.batchInsert(results.data)
+                        Rows.update(Validations, {$set: {valid: true}}, {multi: true})
+                    }
+                    TotalRows.set(TotalRows.get() + results.data.length)
                 }
             }
         )
@@ -30,9 +34,9 @@ Template.readCSV.events({
 
 Template.readCSV.helpers({
   
-    rows: () => Rows.find({},{limit:200}).fetch(),
+    rows: () => Rows.find({},{limit:100}).fetch(),
   
-    total_rows: () => Rows.find().count(),
+    total_rows: () => TotalRows.get(),
   
     attributes: (row) => {
       if (row.valid)
