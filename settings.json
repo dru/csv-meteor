@@ -4,7 +4,7 @@
       "env": 
       { 
         "ROOT_URL": "http://datahub.unteleported.com",
-        "MONGO_URL": "mongodb://datahub:@ds011374.mlab.com:11374/datahub"
+        "MONGO_URL": "mongodb://datahub:data01@ds011374.mlab.com:11374/datahub"
       }
     }
 }

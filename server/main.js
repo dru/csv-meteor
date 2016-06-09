@@ -1,29 +1,56 @@
 import { Meteor } from 'meteor/meteor';
 
-
 export const Rows = new Mongo.Collection('rows');
 
-Meteor.startup(() => {
-    Rows.allow({
-        insert: function(){ return true }
-    });
-  
-    return Meteor.methods({
+if (Meteor.isServer) {
+  Meteor.publish('rows', function() {
+    if (! this.userId)
+      return this.Ready()
+      
+    return Rows.find({owner: this.userId}, {limit: 100}, {reactive: false})
+  })
+}
 
+export const Validations = {
+  $and: [
+    { phone: {$ne: ""} },
+    { email: {$ne: ""} }
+  ]
+}
+
+Meteor.startup(() => {
+    return Meteor.methods({
+      
         removeAllRows: function() {
-            return Rows.remove({});
+            if (! Meteor.userId()) {
+              throw new Meteor.Error('not-authorized');
+            }
+          
+            return Rows.remove({owner:Meteor.userId()});
+        },
+        
+        validateData: () => {
+          if (! Meteor.userId()) {
+            throw new Meteor.Error('not-authorized');
+          }
+          Validations.owner = Meteor.userId() 
+          Rows.update(Validations, {$set: {valid: true}}, {multi: true})
         },
 
         insertData: (dataArray) => {
+            if (! Meteor.userId()) {
+              throw new Meteor.Error('not-authorized');
+            }
+            
             var chunkSize = 3000
             var bulkOp = Rows.rawCollection().initializeUnorderedBulkOp()
             var counter = 0
-            console.log("Got data")
+            
             for (data of dataArray) {
+                data.owner = Meteor.userId()
                 bulkOp.insert(data)
                 counter++
                 if (counter % chunkSize == 0) {
-                    console.log(3000)
                     bulkOp.execute(function(e, result) {})
                     bulkOp = Rows.rawCollection().initializeUnorderedBulkOp()
                 }
@@ -32,10 +59,8 @@ Meteor.startup(() => {
             if (counter % chunkSize != 0){
                 bulkOp.execute(function(e, result) {})
             }
-             
+
             return dataArray.length
         }
-
     });
-  
 });

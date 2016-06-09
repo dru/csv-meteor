@@ -21,4 +21,7 @@ ecmascript              # Enable ECMAScript2015+ syntax in app code
 #insecure                # Allow all DB writes from clients (for prototyping)
 
 harrison:papa-parse
-bootstrap
+accounts-password
+ian:accounts-ui-bootstrap-3
+twbs:bootstrap
+aldeed:simple-schema

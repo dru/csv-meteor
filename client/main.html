@@ -3,22 +3,45 @@
 </head>
 
 <body>
-  <div style="padding:10px">
-    <h1>Data Hub</h1>
-    {{> readCSV}}
-  </div><!-- /.container -->  
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">DataHub</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            {{> loginButtons}}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      {{#if currentUser}}
+      {{> readCSV}}
+      {{/if}}
+    </div>
 </body>
 
+
 <template name="readCSV">
+  
+  <div class="row">
 
-  <input type="file" id="csv-file" name="files"/>
-  <button type="submit" class="btn btn-primary readCSVButton">Read</button>
+    <div class="col-lg-3">
+      <div class="input-group">
+        <input type="file" id="csv-file" class="form-control" placeholder="CSV file...">
+        <span class="input-group-btn">
+          <button class="btn btn-default readCSVButton" type="button">Go!</button>
+        </span>
+      </div>
+    </div>
+  </div>
 
-  <h4>Total rows: {{ total_rows }}</h4>
-
+  <h4>Status: {{ total_rows }}</h4>
   
   <table class="table table-striped table-bordered">
-    
+    <tbody>
     {{#each row in rows}}
       <tr {{attributes row}}>
         {{#each field in arrayify row}}
@@ -26,7 +49,7 @@
         {{/each}}
       </tr>
     {{/each}}
-    
+    </tbody>
   </table>
   
 </template>
