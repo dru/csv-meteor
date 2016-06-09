@@ -13,6 +13,8 @@ export const Validations = {
 
 TotalRows = new ReactiveVar(0)
 
+Papa.LocalChunkSize = 1024 * 1024 * 2
+
 Template.readCSV.events({
     "click .readCSVButton": (event, template) => {
         Papa.parse(
