@@ -2,7 +2,7 @@ import { Template } from 'meteor/templating'
 import { ReactiveVar } from 'meteor/reactive-var'
 import { Mongo } from 'meteor/mongo'
 
-export const Rows = new Mongo.Collection(null)
+export const Rows = new Mongo.Collection("rows")
 
 export const Validations = {
     $and: [
@@ -13,24 +13,30 @@ export const Validations = {
 
 TotalRows = new ReactiveVar(0)
 
-Papa.LocalChunkSize = 1024 * 1024 * 2
+Papa.LocalChunkSize = 1024 * 1024 * 1
 
 Template.readCSV.events({
     "click .readCSVButton": (event, template) => {
-        Papa.parse(
-            template.find('#csv-file').files[0],
-            {
-                header: true,
-                skipEmptyLines: true,
-                chunk: (results) => {
-                    if (TotalRows.get() == 0) {
-                        Rows.batchInsert(results.data)
-                        Rows.update(Validations, {$set: {valid: true}}, {multi: true})
+        Meteor.call("removeAllRows", () => {
+            Papa.parse(
+                template.find('#csv-file').files[0],
+                {
+                    header: true,
+                    skipEmptyLines: true,
+                    chunk: (results, parser) => {
+                        console.log("chunk: " + results.data.length)
+                        parser.pause()
+                        if (results.data.length > 0) {
+                            Meteor.call("insertData", results.data, (err, total) => {
+                                console.log("return: " + total)
+                                TotalRows.set(TotalRows.get() + total)
+                                parser.resume()
+                            })
+                        }
                     }
-                    TotalRows.set(TotalRows.get() + results.data.length)
                 }
-            }
-        )
+            )
+        })
     }
 })
 
